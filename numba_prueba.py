@@ -115,7 +115,7 @@ def main():
     nImages = [labels.count(x) for x in sorted(set(labels))]
     
     
-    nExamplesPerClass = 5000
+    nExamplesPerClass = 500
     imagesPerClassInMinibatch = 100
     Nc = 10
 
@@ -128,10 +128,10 @@ def main():
     
     # Training
     W = np.random.normal(-0.3, 0.3, (K, N+Nc))
-    V = np.concatenate((X[:, np.random.choice(nExamplesPerClass, int(K/Nc), replace=False)].reshape(K,N), np.array(sorted((np.identity(Nc)*2-1).tolist() * int(K/Nc), reverse=True))),axis=1)
+    V = np.random.normal(-0.3, 0.3, (K, N+Nc)) #np.concatenate((X[:, np.random.choice(nExamplesPerClass, int(K/Nc), replace=False)].reshape(K,N), np.array(sorted((np.identity(Nc)*2-1).tolist() * int(K/Nc), reverse=True))),axis=1)
     np.random.shuffle(V)
     
-    nEpochs = 300
+    nEpochs = 200
     
     eo = 0.01 # 0.01<= eo >= 0.04
     fe = 0.998
@@ -150,8 +150,8 @@ def main():
         e = eo*np.float_power(fe,epoch) 
         obj_func = 0
         for t in range(nUpdates):
-            start = time.time()
-            print("epoch =", epoch+1, ",update =",t+1)
+            #start = time.time()
+            #print("epoch =", epoch+1, ",update =",t+1)
             c = np.zeros((M,Nc))
             dW = np.zeros((K,N+Nc))
             v = np.array([i[t*imagesPerClassInMinibatch:t*imagesPerClassInMinibatch+imagesPerClassInMinibatch] for i in X]).reshape(M, N)
@@ -163,8 +163,8 @@ def main():
             updateW(V,dW,e,p,Nc,W)
             
             obj_func += np.sum(np.power(c-tX,2*m))
-            end = time.time()
-            print("Minibatch time %s" % (end - start))
+            #end = time.time()
+            #print("Minibatch time %s" % (end - start))
         
 #        confusion_matrix = np.zeros((Nc,Nc), dtype=int)
 #        for i in prange(Nc):
@@ -198,7 +198,7 @@ def main():
 #        error_testing[epoch] = (1 - np.sum(np.diagonal(confusion_matrix))/(Nc*100))*100
 #        
         error_obj[epoch] = obj_func
-        print(obj_func)
+        print(epoch,obj_func)
         
         for i in memoriestograph:
             plt.imsave(str(i)+"epoch"+str(epoch),W[i,0:N].reshape(width, height), vmin=-1, vmax=1,  cmap="coolwarm", format="png")
